@@ -1,0 +1,46 @@
+FROM alpine:3.11
+RUN apk update && apk add --no-cache \
+build-base \
+g++ \
+cairo-dev \
+jpeg-dev \
+pango-dev \
+giflib-dev \
+curl \
+bash \
+coreutils \
+libstdc++ \
+git \
+librsvg-dev \
+lddtree \
+pax-utils \
+zlib-dev \
+libffi-dev \
+libpng-dev \
+libjpeg-turbo-dev \
+fribidi-dev \
+pcre-dev \
+glib-dev \
+freetype-dev \
+harfbuzz-dev \
+expat-dev \
+fontconfig-dev \
+pixman-dev \
+python2 \
+gdk-pixbuf-dev \
+libxml2-dev \
+libcroco-dev
+
+RUN bash -c 'touch ~/.profile'
+
+# https://stackoverflow.com/questions/52196518/could-not-get-uid-gid-when-building-node-docker
+ENV npm_config_unsafe_perm=true
+# Suppress g++ casting warnings that come from node, nan and v8 (https://github.com/nodejs/nan/issues/807)
+ENV CXXFLAGS="-Wno-cast-function-type"
+RUN curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+
+# Get nvm to work with alpine https://github.com/nvm-sh/nvm/issues/1102#issuecomment-550572252
+RUN bash -c 'echo "NVM_NODEJS_ORG_MIRROR=https://unofficial-builds.nodejs.org/download/release" >> ~/.profile'
+RUN bash -c 'echo "nvm_get_arch() { nvm_echo \"x64-musl\"; }" >> ~/.profile'
+
+RUN bash -c 'source ~/.profile; cd; nvm install v12'
